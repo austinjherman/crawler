@@ -7,18 +7,26 @@ use Goutte\Client as GoutteClient;
 class CrawlerController extends Controller {
 
   public function __construct() {
-    $this->allowedDomain = 'http://tilleeyecareassociates.com/';
+    $this->allowedDomain = 'example.com';
+    $this->startUrl = 'http://example.com';
+    $this->urls = [];
+    $this->client = new GoutteClient();
   }
 
   public function run() {
-    $client = new GoutteClient();
-    $crawler = $client->request('GET', $this->allowedDomain);
-    $r = $crawler->filter('a')->each(function ($node) {
-      if (strpos($node->attr('href'), $this->allowedDomain)) {
-        return $node->text();
+    $this->enqueueUrls();
+    //var_dump($this->urls);
+  }
+
+  public function enqueueUrls() {
+    $crawler = $this->client->request('GET', $this->startUrl);
+    $crawler->filter('a')->each(function ($node) {
+      var_dump($node);
+      $href = $node->attr('href');
+      if (strpos($href, $this->allowedDomain) && !in_array($href, $this->urls)) {
+        $this->urls[] = $href;
       }
     });
-    var_dump($r);
   }
 
 }
