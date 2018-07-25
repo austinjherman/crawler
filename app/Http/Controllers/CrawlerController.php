@@ -9,7 +9,7 @@ class CrawlerController extends Controller {
   public function __construct() {
     $this->allowedDomain = 'tilleeyecareassociates.com';
     $this->startUrl = 'https://www.tilleeyecareassociates.com';
-    $this->finalUrls = [];
+    $this->processedUrls = [];
     $this->unprocessedUrls = [
       $this->startUrl
     ];
@@ -18,13 +18,14 @@ class CrawlerController extends Controller {
 
   public function run() {
     $this->findLinks();
-    // echo '<pre>';
-    // var_dump($this->finalUrls);
-    // echo '</pre>';
+    echo '<pre>';
+    var_dump($this->processedUrls);
+    echo '</pre>';
   }
 
   public function findLinks($urlToProcess=null) {
 
+    // base case
     if (empty($this->unprocessedUrls)) {
       return;
     }
@@ -40,16 +41,18 @@ class CrawlerController extends Controller {
       $crawler = $this->client->request('GET', $urlToProcess);
     }
 
+    // set the current URL as processed so we don't crawl forever
+    $this->processedUrls[] = $urlToProcess;
+
     // find all <a> tags in DOM object
     $crawler->filter('a')->each(function ($node, $i) {
       $href = $node->attr('href');
+      // remove trailing slash
       if ($href[-1] === '/') {
         $href = rtrim($href, '/');
       }
-      if (strpos($href, $this->allowedDomain) && !in_array($href, $this->finalUrls)) {
-        $this->finalUrls[] = $href;
-      }
-      if (strpos($href, $this->allowedDomain) && !in_array($href, $this->unprocessedUrls)) {
+      // 
+      if (strpos($href, $this->allowedDomain) && !in_array($href, $this->unprocessedUrls) && !in_array($href, $this->processedUrls)) {
         $this->unprocessedUrls[] = $href;
       }
     });
@@ -60,13 +63,9 @@ class CrawlerController extends Controller {
       unset($this->unprocessedUrls[$key]);
     }
 
-    echo '<pre>';
-    var_dump($this->unprocessedUrls);
-    echo '</pre>';
-
-    //foreach($this->unprocessedUrls as $unprocessedUrl) {
-      //$this->findLinks($unprocessedUrl);
-    //}
+    foreach($this->unprocessedUrls as $unprocessedUrl) {
+      $this->findLinks($unprocessedUrl);
+    }
 
   }
 
