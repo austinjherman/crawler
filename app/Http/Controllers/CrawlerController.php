@@ -7,8 +7,8 @@ use Goutte\Client as GoutteClient;
 class CrawlerController extends Controller {
 
   public function __construct() {
-    $this->allowedDomain = rtrim('sociusmarketing.com', '/');
-    $this->startUrl = rtrim('https://www.sociusmarketing.com/', '/');
+    $this->allowedDomain = rtrim('tilleeyecareassociates.com', '/');
+    $this->startUrl = rtrim('https://www.tilleeyecareassociates.com/', '/');
     $this->processedUrls = [];
     $this->unprocessedUrls = [
       $this->startUrl
@@ -17,6 +17,7 @@ class CrawlerController extends Controller {
   }
 
   public function run() {
+    ini_set('max_execution_time', 300); //300 seconds = 5 minutes
     $start = microtime(true);
     $this->findLinksV2();
     $time_elapsed_secs = microtime(true) - $start;
