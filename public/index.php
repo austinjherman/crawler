@@ -25,4 +25,5 @@ $app = require __DIR__.'/../bootstrap/app.php';
 |
 */
 
+ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 $app->run();
