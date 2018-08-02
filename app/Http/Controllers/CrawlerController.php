@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use DOMDocument;
+use DOMXPath;
 use Goutte\Client as GoutteClient;
+use App\Crawler\Client as AppClient;
 
 class CrawlerController extends Controller {
 
   public function __construct() {
     $this->allowedDomain = rtrim('tilleeyecareassociates.com', '/');
-    $this->startUrl = rtrim('https://www.tilleeyecareassociates.com/', '/');
+    $this->startUrl = rtrim('http://tilleeyecareassociates.com/', '/');
     $this->processedUrls = [];
     $this->unprocessedUrls = [
       $this->startUrl
@@ -19,12 +22,13 @@ class CrawlerController extends Controller {
   public function run() {
     ini_set('max_execution_time', 300); //300 seconds = 5 minutes
     $start = microtime(true);
-    $this->findLinksV2();
+    //$this->findLinksV3();
+    $this->findLinksV3($this->startUrl);
     $time_elapsed_secs = microtime(true) - $start;
     echo '<p>Execution Time: ' . $time_elapsed_secs . '</p>';
-    echo '<pre>';
-    var_dump($this->processedUrls);
-    echo '</pre>';
+    //echo '<pre>';
+    //var_dump($this->processedUrls);
+    //echo '</pre>';
   }
 
   public function findLinks($urlToProcess=null) {
@@ -99,5 +103,58 @@ class CrawlerController extends Controller {
     return;
 
   }
+
+
+  public function findLinksV3($urlToProcess) {
+    $client = new AppClient();
+    $dom = $client->request('GET', $urlToProcess);
+    //$dom = new DOMXPath($dom);
+    //$nodes = $dom->query('//body//a');
+    $nodes = $dom->getElementsByTagName('a');
+    $count = 0;
+    foreach($nodes as $node) {
+      $url = $this->rel2abs($node->getAttribute('href'), $this->startUrl);
+      if (strpos($url, $this->allowedDomain) !== false) {
+        $count++;
+        echo $url . '<br>';
+      } 
+    }
+    echo 'Count: ' . $count;
+  }
+
+
+  //https://stackoverflow.com/questions/4444475/transfrom-relative-path-into-absolute-url-using-php
+  public function rel2abs($rel, $base) {
+    /* return if already absolute URL */
+    if (parse_url($rel, PHP_URL_SCHEME) != '') return $rel;
+
+    /* queries and anchors */
+    if ($rel[0]=='#' || $rel[0]=='?') return $base.$rel;
+
+    /* parse base URL and convert to local variables:
+       $scheme, $host, $path */
+    //extract(parse_url($base));
+    $scheme = parse_url($base, PHP_URL_SCHEME);
+    $host = parse_url($base, PHP_URL_HOST);
+    $path = parse_url($base, PHP_URL_PATH);
+
+    /* remove non-directory element from path */
+    $path = preg_replace('#/[^/]*$#', '', $path);
+
+    /* destroy path if relative url points to root */
+    if ($rel[0] == '/') $path = '';
+
+    /* dirty absolute URL */
+    $abs = "$host$path/$rel";
+
+    /* replace '//' or '/./' or '/foo/../' with '/' */
+    $re = array('#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#');
+    for($n=1; $n>0; $abs=preg_replace($re, '/', $abs, -1, $n)) {}
+
+    /* absolute URL is ready! */
+    return $scheme.'://'.$abs;
+  }
+
+
 
 }
