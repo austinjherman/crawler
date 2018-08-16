@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Cache;
 class UrlCrawlerController extends Controller {
 
   public function __construct() {
-    $this->allowedDomain = rtrim('tilleeyecareassociates.com', '/');
-    $this->startUrl = rtrim('https://www.tilleeyecareassociates.com', '/');
+    $this->allowedDomain = rtrim('one51place.com', '/');
+    $this->startUrl = rtrim('http://one51place.com', '/');
     $this->processedUrls = [];
     $this->client = new GoutteClient();
   }
@@ -27,6 +27,7 @@ class UrlCrawlerController extends Controller {
 
     // check cache 
     $urls = Cache::get($this->allowedDomain);
+    //$urls = false;
     if (!$urls) {
       $this->findLinks($this->startUrl);
       Cache::add($this->allowedDomain, $this->processedUrls, 2);
@@ -55,9 +56,9 @@ class UrlCrawlerController extends Controller {
     $this->processedUrls[$urlToProcess] = [
       'response' => $this->client->getResponse()->getStatus(),
       'content_type' => $this->client->getResponse()->getHeader('Content-Type'),
-      'headers' => $this->client->getResponse()->getHeaders(),
-      'crawler_object' => serialize($crawler),
-      'html' => $crawler->html()
+      //'headers' => $this->client->getResponse()->getHeaders(),
+      //'crawler_object' => serialize($crawler),
+      //'html' => $crawler->html()
     ];
 
     // for each link
