@@ -15,4 +15,5 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->get('/crawl', 'CrawlerController@run');
+$router->get('/crawl/urls', 'UrlCrawlerController@run');
+//$router->get('/crawl/urls', 'CrawlForContentController@run');
