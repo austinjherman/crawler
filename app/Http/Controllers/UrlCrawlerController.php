@@ -58,10 +58,11 @@ class UrlCrawlerController extends Controller {
    * @return void
    */
   public function __construct() {
-    $this->allowedDomain = rtrim('sociusmarketing.com', '/');
-    $this->startUrl = rtrim('https://www.sociusmarketing.com', '/');
+    $this->allowedDomain = rtrim('example.com', '/');
+    $this->startUrl = rtrim('http://example.com/', '/');
     $this->processedUrls = [];
     $this->unprocessedUrls = [];
+    $this->urlCount = 0;
     $this->client = new GoutteClient();
   }
 
@@ -77,7 +78,7 @@ class UrlCrawlerController extends Controller {
     $start = microtime(true);
     
     // set a max execution time
-    ini_set('max_execution_time', 900); //300 seconds = 5 minutes
+    ini_set('max_execution_time', 1200); //300 seconds = 5 minutes
 
     // check cache 
     $urls = false;
@@ -99,13 +100,13 @@ class UrlCrawlerController extends Controller {
     // end timer
     $time_elapsed_secs = microtime(true) - $start;
 
-    $countProcessed = count($urls->processedUrls);
-    $countUnprocessed = count($urls->unprocessedUrls);
+    $countProcessed = count($this->processedUrls);
+    $countUnprocessed = count($this->unprocessedUrls);
 
     return response()->json([
       'allowed_domain' => $this->allowedDomain,
       'execution_time' => $time_elapsed_secs,
-      'urls_found' => $countProcessed + $countUnprocessed,
+      'urls_found' => $this->urlCount,
       'urls_crawled' => [
         'count' => $countProcessed,
         'urls' => $urls->processedUrls
@@ -126,6 +127,8 @@ class UrlCrawlerController extends Controller {
    * @return void
    */
   public function findLinks($urlToProcess) {
+
+    $this->urlCount++;
     
     // get crawler object
     $crawler = $this->client->request('GET', $urlToProcess);
@@ -134,7 +137,7 @@ class UrlCrawlerController extends Controller {
     $page = $this->buildPageObject($urlToProcess, $crawler);
     $this->cachePageObject($page);
 
-    // mark url as processed and save html
+    // mark url as processed 
     $this->processedUrls[] = $urlToProcess;
 
     // for each link
