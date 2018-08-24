@@ -147,7 +147,7 @@ class UrlCrawlerController extends Controller {
       $crawlUrl = $this->parseUrl($fullUrl);
 
       if ($crawlUrl) {
-        $this->findLinks($fullUrl);
+        $this->findLinks($crawlUrl);
       }
 
     });
