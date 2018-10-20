@@ -59,7 +59,7 @@ class UrlCrawlerController extends Controller {
    */
   public function __construct() {
     $this->allowedDomain = rtrim('example.com', '/');
-    $this->startUrl = rtrim('http://example.com/', '/');
+    $this->startUrl = rtrim('http://example.com', '/');
     $this->processedUrls = [];
     $this->unprocessedUrls = [];
     $this->urlCount = 0;

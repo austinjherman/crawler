@@ -18,7 +18,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'name', 'email',
+        'name', 'email', 'password'
     ];
 
     /**
@@ -27,6 +27,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password',
+        'password', 'id'
     ];
+
+    /**
+     * Get the tokens for the user post.
+     */
+    public function tokens()
+    {
+        return $this->hasMany('App\Token');
+    }
+
 }
