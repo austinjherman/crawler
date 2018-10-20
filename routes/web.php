@@ -21,5 +21,7 @@ $router->post('/users/update/{id}', ['middleware' => 'auth', 'uses' => 'UserCont
 $router->post('/users/delete/{id}', ['middleware' => 'auth', 'uses' => 'UserController@delete']);
 
 $router->post('/login', ['uses' => 'AuthController@login']);
+$router->get('/protected', ['middleware' =>'auth', 'uses' => 'UserController@test']);
 
 $router->get('/crawl/urls', ['middleware' =>'auth', 'uses' => 'UrlCrawlerController@run']);
+

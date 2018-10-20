@@ -42,7 +42,7 @@ class AuthController extends Controller
         	$token->token_hash = $tokenParts['tokenHash'];
         	$token->user_id = $user->id;
         	$token->save();
-        	return response()->json($token, 200);
+        	return response()->json(['apiKey' => $tokenParts['apiKey'], 'tokenHash' => $tokenParts['tokenHash']], 201);
     	}
 
     	return response()->json(['message' => 'username/password combination incorrect'], 400);

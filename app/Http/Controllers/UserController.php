@@ -53,4 +53,8 @@ class UserController extends Controller
         
     }
 
+    public function test(Response $response) {
+        return new Response('this is a protected page');
+    }
+
 }

@@ -14,11 +14,10 @@ class TokenFactory
     static public function create($args = []) {
         do {
             if(!empty($args && isset($args['blacklist_in']))) {
-                $expires = $args['blacklist_in'];
-                $apiKey = base64_encode(str_random(40) . '{claims: {"expires":"' . (string)$expires . '"}}');
+                $apiKey = base64_encode(str_random(40));
             }
             else {
-                $apiKey = base64_encode(str_random(40) . '{claims: {"expires":"720"}}');
+                $apiKey = base64_encode(str_random(40));
             }
             $tokenHash = base64_encode(str_random(40));
         }
