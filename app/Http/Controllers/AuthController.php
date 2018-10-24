@@ -38,11 +38,11 @@ class AuthController extends Controller
         		'blacklist_in' => 2
         	]);
         	$token = new Token();
-        	$token->token = Hash::make($tokenParts['apiKey']);
-        	$token->token_hash = $tokenParts['tokenHash'];
-        	$token->user_id = $user->id;
+        	$token->token = Hash::make($tokenParts['apiKey']) . $user->hash;
+            $token->active = true;
+        	//$token->user_hash = Hash::make($user->hash);
         	$token->save();
-        	return response()->json(['apiKey' => $tokenParts['apiKey'], 'tokenHash' => $tokenParts['tokenHash']], 201);
+        	return response()->json(['apiKey' => $tokenParts['apiKey'], 201);
     	}
 
     	return response()->json(['message' => 'username/password combination incorrect'], 400);

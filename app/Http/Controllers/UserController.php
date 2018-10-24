@@ -28,6 +28,10 @@ class UserController extends Controller
         $user = new User();
         $user->email = $request->json()->get('email');
         $user->password = Hash::make($request->json()->get('password'));
+        do {
+            $userHash = base64_encode(str_random(40));
+        } while(User::where('hash', $userHash)->first());
+        $user->hash = $userHash;
         $user->save();
         return response()->json($user, 201);
     }
