@@ -86,6 +86,7 @@ class UrlCrawlerController extends Controller {
       Cache::forget($this->allowedDomain);
     }
     else {
+      // unserialize(null) will return null
       $urls = unserialize(Cache::get($this->allowedDomain));
     }
 
