@@ -28,15 +28,15 @@ $router->get('/crawl/urls', ['middleware' =>'auth', 'uses' => 'UrlCrawlerControl
 // TODO
 
 // Should find all the links within a given domain and cache the responses
-//$router->get('/crawl', ['middleware' => 'auth', 'uses' => '']);
+$router->get('/crawl', ['middleware' => 'auth', 'uses' => 'SiteCrawlerController@run']);
 
 // Should return a list of all sites that were crawled by the authenticated user
-//$router->get('/sites', ['middleware' =>'auth', 'uses' => '']);
+//$router->get('/sites', ['middleware' =>'auth', 'uses' => 'SiteController@index']);
 
 // Should return a summary of the requested domain, which should have been 
 // crawled already by the authenticated user
-//$router->get('/sites/{domain}', ['middleware' =>'auth', 'uses' => '']);
+//$router->get('/sites/{domain}', ['middleware' =>'auth', 'uses' => 'SiteController@read']);
 
-// Should return a json-formatted list of pages for wordpress import
+// Should return a json-formatted list of pages for wordpress import and cache the result
 //$router->get('/sites/{domain}/scrape', ['middleware' =>'auth', 'uses' => '']);
 

@@ -57,40 +57,37 @@ class UrlCrawlerController extends Controller {
    *
    * @return void
    */
-  public function __construct() {
-    $this->allowedDomain = rtrim('example.com', '/');
-    $this->startUrl = rtrim('http://example.com', '/');
+  public function __construct(String $domain) {
+    $this->allowedDomain = rtrim($domain, '/');
+    $this->startUrl = rtrim("http://$domain", '/');
+    $this->client = new GoutteClient();
     $this->processedUrls = [];
     $this->unprocessedUrls = [];
     $this->urlCount = 0;
-    $this->client = new GoutteClient();
   }
 
 
   /**
    * Run the crawler
    *
-   * @return json response
+   * @return void
    */
-  public function run() {
+  public function crawl() {
 
-    // check cache 
-    $urls = false;
-    if (isset($_GET['nocache'])) {
-      Cache::forget($this->allowedDomain);
-    }
-    else {
-      // unserialize(null) will return null
-      $urls = unserialize(Cache::get($this->allowedDomain));
-    }
+  	// set a max execution time
+    ini_set('max_execution_time', 1200); //300 seconds = 5 minutes
 
-    if (!$urls) {
-      $this->findLinks($this->startUrl);
-      $urls = new \stdClass();
-      $urls->processedUrls = $this->processedUrls;
-      $urls->unprocessedUrls = $this->unprocessedUrls;
-      Cache::add($this->allowedDomain, serialize($urls), self::CACHE_TIME);
-    }
+    // start timer
+    $start = microtime(true);
+
+	$this->findLinks($this->startUrl);
+	$urls = new \stdClass();
+    $urls->processedUrls = $this->processedUrls;
+    $urls->unprocessedUrls = $this->unprocessedUrls;
+    Cache::add($this->allowedDomain, serialize($urls), self::CACHE_TIME);
+
+    // end timer
+    $time_elapsed_secs = microtime(true) - $start;
 
   }
 
