@@ -30,12 +30,4 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password', 'id', 'hash'
     ];
 
-    /**
-     * Get the tokens for the user post.
-     */
-    public function tokens()
-    {
-        return $this->hasMany('App\Token');
-    }
-
 }

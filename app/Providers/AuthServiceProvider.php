@@ -4,8 +4,9 @@ namespace App\Providers;
 
 use App\User;
 use App\Token;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
+use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\ValidationData;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -33,18 +34,25 @@ class AuthServiceProvider extends ServiceProvider
         // the User instance via an API token or any other method necessary.
 
         $this->app['auth']->viaRequest('api', function ($request) {
-            if ($token = $request->header('Token')) {
-                $token = Token::where('token_hash', $tokenHash)->first();
-                if($token) {
-                    $user = User::find($token->user_id);
-                    $userTokens = $user->tokens()->get();
-                    foreach($userTokens as $userToken) {
-                        if(Hash::check($request->header('Token'), $userToken->token)) {
-                            return $user;
+            $signer = new Sha256();
+            if ($token = $request->header('Bearer')) {
+                try {
+                    $token = (new Parser())->parse((string) $token);
+                } catch (\Exception $e) {
+                    return null;
+                }
+                if ($token->verify($signer, getenv('JWT_SECRET'))) {
+                    if ($jti = Token::where('jti', $token->getHeader('jti'))->first()) {
+                        $data = new ValidationData();
+                        $data->setIssuer(url('/'));
+                        $data->setId($jti->jti);
+                        if($token->validate($data)) {
+                            return User::where('hash', $token->getClaim('uid'))->first();
                         }
                     }
                 }
             }
+            return null;
         });
     }
 }

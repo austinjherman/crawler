@@ -34,15 +34,8 @@ class AuthController extends Controller
         $user = User::where('email', $email)->first();
  
         if($user && Hash::check($inputPw, $user->password)) {
-        	$tokenParts = TokenFactory::create([
-        		'blacklist_in' => 2
-        	]);
-        	$token = new Token();
-        	$token->token = Hash::make($tokenParts['apiKey']) . $user->hash;
-            $token->active = true;
-        	//$token->user_hash = Hash::make($user->hash);
-        	$token->save();
-        	return response()->json(['apiKey' => $tokenParts['apiKey'], 201);
+        	$token = TokenFactory::create($user);
+        	return response()->json(['token' => (string)$token], 200);
     	}
 
     	return response()->json(['message' => 'username/password combination incorrect'], 400);

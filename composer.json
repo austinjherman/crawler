@@ -10,7 +10,8 @@
         "vlucas/phpdotenv": "~2.2",
         "symfony/dom-crawler": "^4.1",
         "symfony/css-selector": "^4.1",
-        "fabpot/goutte": "^3.2"
+        "fabpot/goutte": "^3.2",
+        "lcobucci/jwt": "^3.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

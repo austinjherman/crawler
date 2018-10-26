@@ -14,7 +14,7 @@ class Token extends Model
      * @var array
      */
     protected $fillable = [
-        'token'
+        'jti'
     ];
 
     /**
@@ -23,15 +23,7 @@ class Token extends Model
      * @var array
      */
     protected $hidden = [
-        'id'
+        'id', 'jti'
     ];
-
-    /**
-     * Get the user that owns the token.
-     */
-    public function user()
-    {
-        return $this->belongsTo('App\User');
-    }
 
 }

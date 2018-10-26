@@ -2,29 +2,29 @@
 
 namespace App\Factories;
 
-use App\Token;
-use Illuminate\Support\Facades\Hash;
+use App\User;
+use App\Factories\JtiFactory;
+use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 class TokenFactory
 {
     
     /**
-     * Generate an API Key with embedded expiry
+     * Generate an API Key
      */
-    static public function create($args = []) {
-        do {
-            if(!empty($args && isset($args['blacklist_in']))) {
-                $apiKey = base64_encode(str_random(40));
-            }
-            else {
-                $apiKey = base64_encode(str_random(40));
-            }
-            $tokenHash = base64_encode(str_random(40));
-        }
-        while(Token::where('token', $apiKey)->first() && Token::where('token_hash', $tokenHash)->first());
-        return ['tokenHash' => $tokenHash, 'apiKey' => $apiKey];
+    static public function create(User $user) {
+        $signer = new Sha256();
+        $token = (new Builder())->setIssuer(url('/')) // Configures the issuer (iss claim)
+                        //->setAudience(App::make('url')->to('/')) // Configures the audience (aud claim)
+                        ->setId(JtiFactory::create(), true) // Configures the id (jti claim), replicating as a header item
+                        ->setIssuedAt(time()) // Configures the time that the token was issue (iat claim)
+                        //->setNotBefore(time() + 60) // Configures the time that the token can be used (nbf claim)
+                        ->setExpiration(time() + 3600*24) // Configures the expiration time of the token (exp claim)
+                        ->set('uid', $user->hash) // Configures a new claim, called "uid"
+                        ->sign($signer, getenv('JWT_SECRET')) // creates a signature using "testing" as key
+                        ->getToken(); // Retrieves the generated token
+        return $token;
     }
-
-
 
 }
